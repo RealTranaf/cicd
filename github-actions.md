@@ -1,8 +1,10 @@
 <h1 align="center">Triển khai CI/CD pipeline bằng Github Actions</h1>
 
-Github Actions là dịch vụ CI/CD được tích hợp sẵn trong Github, cho phép tự động hóa các tác vụ như build, test, đóng gói Docker image, deploy lên server hoặc Kubernetes mỗi khi có sự kiện xảy ra trong repo. Các tác vụ này được chạy sử dụng dịch vụ của Github, ko yêu cầu setup nhiều từ người dùng khiên cho đây là một trong những giải pháp CI/CD dễ sử dụng nhất.
+Github Actions là dịch vụ CI/CD được tích hợp sẵn trong Github, cho phép tự động hóa các tác vụ như build, test, đóng gói Docker image, deploy lên server hoặc Kubernetes mỗi khi có sự kiện xảy ra trong repo.
 
-Mấu chốt hoạt động của Github Actions nằm ở file workflow, workflow định đoạt toàn bộ pipeline. Những thành phần trong workflow:
+Các tác vụ CI/CD pipeline được chạy trên một runner, là một máy thực thi workflow có thể do Github cloud cung cấp hoặc có thể thực hiện self-host để chạy trên server riêng.
+
+Mỗi quy trình tự động được định nghĩa trong các tệp YAML được gọi là workflow, được đặt tại thư mục .github/workflows/. Khi xảy ra một sự kiện như push, pull_request hoặc release, GitHub Actions sẽ kích hoạt workflow tương ứng và thực hiện các bước đã được định nghĩa.
 
 - Event: workflow được kích hoạt bởi các event xảy ra với repo như có push mới, pull request, release... Khi các event định nghĩa trong file xảy ra, workflow sẽ chạy.
 
@@ -12,11 +14,9 @@ Mấu chốt hoạt động của Github Actions nằm ở file workflow, workfl
 
 - Action: là các module được Github cung cấp cho người dùng để đơn giản hóa một số tác vụ thường sử dụng trong pipeline. VD: để checkout code, có module actions/checkout@v4; setup nodejs có actions/setup-node@v4...
 
-CI/CD pipeline được chạy trên một Runner. Runner là máy thực thi workflow do Github cung cấp hoặc có thể sử dụng runner self-host để chạy trên server riêng.
+**Cụ thể một file workflow cơ bản**
 
-**Thực hiện triển khai CI/CD bằng Github Actions**
-
-Để tìm hiểu sâu hơn về Actions, thực hiện triển khai pipeline với một ứng dụng frontend đơn giản chạy ReactJS (tạo bằng create-react-app).
+Thực hiện triển khai pipeline với một ứng dụng frontend đơn giản chạy ReactJS (tạo bằng create-react-app).
 
 File workflow sử dụng để triển khai pipeline: [ci.yaml](ci.yaml). Để Github nhận diện được đúng file pipeline này, cần đặt nó trong thư mục ./.github/workflow của project.
 
@@ -116,3 +116,37 @@ jobs:
 - Cuối cùng, để pipeline có thể tự động deploy ứng dụng, runner sẽ đọc kubectl config do người dùng cung cấp và kết nối với session kubectl ở server host ứng dụng và cập nhật image.
 
 Trong file workflow có sử dụng các biến secret được set trong repo của Github, được bảo mật và mã hóa kỹ càng để ko bị lộ thông tin nhạy cảm.
+
+**Sử dụng runner Github cloud**
+
+Máy ảo do Github cung cấp. Khi workflow được kích hoạt Github sẽ tự động tạo một máy ảo mới, thực hiện toàn bộ pipeline và xóa máy sau khi hoàn thành.
+
+Ưu điểm:
+
+- Không cần cài đặt máy chủ.
+- Dễ sử dụng.
+- Được GitHub bảo trì và cập nhật.
+- Phù hợp với các tác vụ CI.
+
+Nhược điểm:
+
+- Không truy cập được các tài nguyên trong mạng nội bộ.
+- Không thể trực tiếp điều khiển K3s nếu Kubernetes API không được công khai.
+- Giới hạn thời gian và tài nguyên theo plan GitHub.
+
+**Sử dụng runner self-host**
+
+Ngoài sử dụng runner cloud do Github cung cấp sẵn, có thể thực hiện cài đặt và self-host runner trên server. 
+
+Ưu điểm:
+
+- Truy cập trực tiếp tài nguyên nội bộ.
+- Có thể triển khai lên K3s mà không cần công khai API Server.
+- Toàn quyền cài đặt phần mềm và cấu hình môi trường.
+- Không bị giới hạn bởi cấu hình của runner Github.
+
+Nhược điểm:
+
+- Người dùng phải tự cài đặt và bảo trì runner.
+- Tiêu tốn tài nguyên của máy chủ.
+- Cần quản lý bảo mật và cập nhật runner.
