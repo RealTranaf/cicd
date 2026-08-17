@@ -1,0 +1,61 @@
+services:
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_DATABASE: logging
+      MYSQL_ROOT_PASSWORD: root
+    volumes:
+      - db_data:/var/lib/mysql
+    restart: unless-stopped
+
+  backend:
+    build: ./logging-be
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/logging
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+
+      OTEL_SERVICE_NAME: logging-backend
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://117.103.203.180:4317
+      OTEL_EXPORTER_OTLP_PROTOCOL: grpc
+      OTEL_TRACES_EXPORTER: otlp
+      OTEL_METRICS_EXPORTER: otlp
+      OTEL_LOGS_EXPORTER: otlp
+      OTEL_JAVAAGENT_ENABLED: true
+
+      OTEL_INSTRUMENTATION_COMMON_DEFAULT_ENABLED: true
+      OTEL_INSTRUMENTATION_SPRING_WEBMVC_ENABLED: true
+      OTEL_INSTRUMENTATION_SPRING_DATA_ENABLED: true
+      OTEL_INSTRUMENTATION_JDBC_ENABLED: true
+      OTEL_INSTRUMENTATION_HIBERNATE_ENABLED: true
+      OTEL_LOGS_INSTRUMENTATION_ENABLED: true
+      OTEL_INSTRUMENTATION_LOGBACK_APPENDER_ENABLED: true
+    depends_on:
+      - db
+    volumes:
+      # - ./logs:/app/logs
+      - backend_logs:/app/logs
+    restart: unless-stopped
+
+  frontend:
+    build: ./logging-fe
+    ports:
+      - "3000:80"
+    environment:
+      OTEL_ENDPOINT: "http://host.docker.internal:4318/v1/traces"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  db_data:
+  backend_logs:
+
+networks:
+  app-network:
+    driver: bridge

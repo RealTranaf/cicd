@@ -212,3 +212,61 @@ Có thể nhấn vào từng stage để xem các log của stage đó:
 
 Nếu pipeline đã chạy thành công, kiểm tra danh sách container đang chạy xem đã có container mới do ứng dụng react được tạo chưa.
 
+Note: mặc dù đã bind mount docker socket trong file compose nhưng có thể sẽ ko bind thành công. Nếu xảy ra lỗi thì vào trong file config.toml trong thư mục config và sửa phần volume như sau:
+
+```
+[runners.docker]
+  volumes = [
+    "/cache",
+    "/var/run/docker.sock:/var/run/docker.sock"
+  ]
+```
+
+Sau khi sửa, thực hiện restart runner và pipeline sẽ tương tác với docker daemon bình thường.
+
+**Deploy một ứng dụng fullstack bằng CI/CD pipeline**
+
+Sử dụng một ví dụ phức tạp hơn là một ứng dụng fullstack: MySQL + Spring Boot + ReactJS. Ban đầu ứng dụng được deploy bằng docker compose. Cấu trúc file:
+
+![alt text](images/2-5.png)
+
+Dockerfile của backend: [Dockerfile](gitlab/Dockerfile-backend)
+
+Dockerfile của frontend: [Dockerfile](gitlab/Dockerfile-frontend)
+
+File docker compose: [docker-compose.yml](gitlab/docker-compose.yml)
+
+Với các ứng dụng đã deploy bằng compose thế này thì việc deploy bằng CI/CD pipeline đơn giản, chỉ cần cho pipeline thực hiện build image và chạy bằng compose. 
+
+```
+stages:
+  - build
+  - deploy
+
+docker-build:
+  stage: build
+  image: docker:27-cli
+
+  before_script:
+    - apk add --no-cache docker-cli-compose
+
+  script:
+    - docker compose build
+
+deploy:
+  stage: deploy
+  image: docker:27-cli
+
+  before_script:
+    - apk add --no-cache docker-cli-compose
+
+  script:
+    - docker compose up -d
+    - docker compose ps
+```
+
+- Pipeline thực hiện build image và chạy bằng compose.
+
+Sau khi chạy thành công, các container sẽ chạy và có thế access website bình thường.
+
+Note: Một container runner có thể chạy nhiều runner cho nhiều project khác nhau. Config riêng của từng runner sẽ được chứa chung trong file config.toml, được cách biệt bởi tên runner đã đặt.
