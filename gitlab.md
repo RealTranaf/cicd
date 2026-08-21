@@ -24,7 +24,7 @@ GitLab Runner
 
 **Gitlab self-host**
 
-Gitlab là một nền tảng DevOps cung cấp nhiều chức năng trong một hệ thống như Git repository, quản lý source code, branch và merge request, CI/CD... Có thể sử dụng Gitlab tại gitlab.com online do chính Gitlab quản lý, hoặc thực hiện triển khai self-host trên server của tổ chức. Lý do sử dụng Gitlab self-host:
+Gitlab là một nền tảng DevOps cung cấp nhiều chức năng trong một hệ thống như git repository, quản lý source code, branch và merge request, CI/CD... Có thể sử dụng Gitlab tại gitlab.com online do chính Gitlab quản lý, hoặc thực hiện triển khai self-host trên server của tổ chức. Lý do sử dụng Gitlab self-host:
 
 - Toàn bộ Gitlab instance được triển khai và quản lý trên server riêng.
 - Kiểm soát dữ liệu: source code, repository và các dữ liệu liên quan được lưu trữ trên hệ thống.

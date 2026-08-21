@@ -1,6 +1,6 @@
 <h1 align="center">Giới thiệu về CI/CD</h1>
 
-CI/CD là tập hợp các quy trình và công cụ giúp tự động hóa việc xây dựng, kiểm thử và triển khai phần mềm. Đây là một trong những thành phần cốt lõi của DevOps và thường được sử dụng cùng Docker, Kubernetes, Git và các nền tảng Cloud.
+CI/CD là tập hợp các quy trình và công cụ giúp tự động hóa việc xây dựng, kiểm thử và triển khai phần mềm. Đây là một trong những thành phần cốt lõi của DevOps và thường được sử dụng cùng Docker, Kubernetes, git và các nền tảng Cloud.
 
 CI/CD là một bộ đôi công việc, bao gồm CI (Continuous Integration) và CD (Continuous Deployment/Delivery), là quá trình tích hợp (integration) thường xuyên, nhanh chóng hơn khi code cũng như thường xuyên cập nhật phiên bản mới (delivery).
 
