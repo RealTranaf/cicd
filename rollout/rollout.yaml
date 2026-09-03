@@ -1,0 +1,33 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+
+metadata:
+  name: test-app
+
+spec:
+  replicas: 2
+
+  selector:
+    matchLabels:
+      app: test-app
+
+  template:
+    metadata:
+      labels:
+        app: test-app
+
+    spec:
+      containers:
+        - name: test-app
+          image: duytranlinh0/test-app:1aa430b7
+
+          imagePullPolicy: Always
+
+          ports:
+            - containerPort: 80
+
+  strategy:
+    blueGreen:
+      activeService: test-app-active
+      previewService: test-app-preview
+      autoPromotionEnabled: false
